@@ -37,7 +37,7 @@ func Open(portName string, mode Mode) (*MWDSerial, error) {
 
 	mode.TxPin.Out(mode.SleepState)
 
-	return &MWDSerial{port: serialPort, mode: mode, delay: time.Second / time.Duration(mode.BaudRate)}, nil
+	return &MWDSerial{port: serialPort, mode: mode, delay: time.Millisecond * time.Duration(1000/mode.BaudRate)}, nil
 }
 
 func (m *MWDSerial) SetMode(mode Mode) error {
