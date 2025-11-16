@@ -9,9 +9,8 @@ import (
 )
 
 type MWDSerial struct {
-	port  serial.Port
-	mode  Mode
-	delay time.Duration // 1 / BaudRate
+	port serial.Port
+	mode Mode
 }
 
 func Open(portName string, mode Mode) (*MWDSerial, error) {
@@ -37,16 +36,11 @@ func Open(portName string, mode Mode) (*MWDSerial, error) {
 
 	mode.TxPin.Out(mode.SleepState)
 
-	return &MWDSerial{port: serialPort, mode: mode, delay: time.Millisecond * time.Duration(1000/mode.BaudRate)}, nil
+	return &MWDSerial{port: serialPort, mode: mode}, nil
 }
 
-func (m *MWDSerial) SetMode(mode Mode) error {
-	err := m.port.SetMode(mode.mode())
-	if err != nil {
-		return err
-	}
-	m.mode = mode
-	return nil
+func (m *MWDSerial) SetMode(mode serial.Mode) error {
+	return m.port.SetMode(&mode)
 }
 
 // Read
@@ -177,11 +171,11 @@ func (m *MWDSerial) write(bits []bool) error {
 		}
 	}
 
-	time.Sleep(m.delay)
+	time.Sleep(m.mode.Delay)
 
 	for _, bit := range bits {
 		m.mode.TxPin.Out(gpio.Level(bit))
-		time.Sleep(m.delay)
+		time.Sleep(m.mode.Delay)
 	}
 
 	// Parity bit
@@ -191,7 +185,7 @@ func (m *MWDSerial) write(bits []bool) error {
 			parityBit = 1 - parityBit
 		}
 		m.mode.TxPin.Out(gpio.Level(parityBit == 1))
-		time.Sleep(m.delay)
+		time.Sleep(m.mode.Delay)
 	}
 
 	m.mode.TxPin.Out(m.mode.SleepState)

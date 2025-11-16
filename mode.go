@@ -1,6 +1,8 @@
 package mwdserial
 
 import (
+	"time"
+
 	"go.bug.st/serial"
 	"periph.io/x/conn/v3/gpio"
 )
@@ -20,6 +22,8 @@ type Mode struct {
 
 	SleepState gpio.Level // Pin state to use when sleeping (idle). Typically gpio.High for standard serial communication.
 	InvertBits bool       // If true, bits will be inverted when bitbanging
+
+	Delay time.Duration // Delay between bits when bitbanging
 
 	// Serial port configuration
 
