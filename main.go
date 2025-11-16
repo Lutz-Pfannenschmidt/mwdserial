@@ -171,11 +171,11 @@ func (m *MWDSerial) write(bits []bool) error {
 		}
 	}
 
-	time.Sleep(m.mode.Delay)
+	sleepBlocking(m.mode.Delay)
 
 	for _, bit := range bits {
 		m.mode.TxPin.Out(gpio.Level(bit))
-		time.Sleep(m.mode.Delay)
+		sleepBlocking(m.mode.Delay)
 	}
 
 	// Parity bit
@@ -185,10 +185,16 @@ func (m *MWDSerial) write(bits []bool) error {
 			parityBit = 1 - parityBit
 		}
 		m.mode.TxPin.Out(gpio.Level(parityBit == 1))
-		time.Sleep(m.mode.Delay)
+		sleepBlocking(m.mode.Delay)
 	}
 
 	m.mode.TxPin.Out(m.mode.SleepState)
 
 	return nil
+}
+
+func sleepBlocking(duration time.Duration) {
+	target := time.Now().Add(duration)
+	for time.Now().Before(target) {
+	}
 }

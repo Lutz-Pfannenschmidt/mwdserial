@@ -27,6 +27,7 @@ type Mode struct {
 
 	// Serial port configuration
 
+	DataBits          int                     // Number of data bits (typically 8), also used for bitbanging
 	BaudRate          int                     // The serial port bitrate (aka Baudrate), also used for bitbanging
 	Parity            serial.Parity           // Parity (see Parity type for more info), also used for bitbanging
 	StopBits          serial.StopBits         // Stop bits (see StopBits type for more info), use StopBitsBitBanged for bitbanged writing
@@ -37,7 +38,7 @@ func (m Mode) mode() *serial.Mode {
 
 	return &serial.Mode{
 		BaudRate:          m.BaudRate,
-		DataBits:          8,
+		DataBits:          m.DataBits,
 		Parity:            m.Parity,
 		StopBits:          m.StopBits,
 		InitialStatusBits: m.InitialStatusBits,
