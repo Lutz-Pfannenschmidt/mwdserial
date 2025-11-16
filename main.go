@@ -153,7 +153,8 @@ func (m *MWDSerial) getParityBit(bits []bool) int {
 }
 
 func (m *MWDSerial) write(bits []bool) error {
-	now := time.Now()
+	now := time.Now().UnixMicro()
+	d := m.mode.Delay.Microseconds()
 
 	if m.mode.InvertBits {
 		invertBits(&bits)
@@ -173,14 +174,14 @@ func (m *MWDSerial) write(bits []bool) error {
 		}
 	}
 
-	now = now.Add(m.mode.Delay)
-	for time.Since(now) >= 0 {
+	now += d
+	for time.Now().UnixMicro() <= now {
 	}
 
 	for _, bit := range bits {
 		m.mode.TxPin.Out(gpio.Level(bit))
-		now = now.Add(m.mode.Delay)
-		for time.Since(now) >= 0 {
+		now += d
+		for time.Now().UnixMicro() <= now {
 		}
 	}
 
@@ -191,8 +192,8 @@ func (m *MWDSerial) write(bits []bool) error {
 			parityBit = 1 - parityBit
 		}
 		m.mode.TxPin.Out(gpio.Level(parityBit == 1))
-		now = now.Add(m.mode.Delay)
-		for time.Since(now) >= 0 {
+		now += d
+		for time.Now().UnixMicro() <= now {
 		}
 	}
 
